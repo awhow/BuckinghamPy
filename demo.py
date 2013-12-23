@@ -40,7 +40,48 @@ repeatingList = [diameter, density, velocity]
 pgl = bp.run(paramList, repeatingList)
 bp.pprint(pgl)
 
+
+
+print("")
+print("Lift on  a Wing")
+
+# Create parameters
+lift = bp.param('FL', ptype='force')
+velocity = bp.param('V', ptype='velocity')
+cord = bp.param('Lc', ptype='length')
+density = bp.param('rho', ptype='density')
+viscosity = bp.param('mu', ptype='viscosity')
+soundspeed = bp.param('c', ptype='velocity')
+attack = bp.param('alpha', ptype='angle')
+
+# Create list of parameters
+paramList = [lift, velocity, cord, density, viscosity, soundspeed, attack]
+
+# Run nondimensionalization process
+pgl = bp.run(paramList, depParam=lift)
+bp.pprint(pgl)
+
+
+
+print("")
+print("Tip Deflection of Cantilever Beam")
+
+# Create parameters
+deflection = bp.param('delta', ptype='length')
+load = bp.param('W', ptype='force')
+length = bp.param('L', ptype='length')
+secMomArea = bp.param('I', ptype='secondMomentOfArea')
+modulus = bp.param('E', dim=[1,-1,-2])
+
+# Create list of parameters
+paramList = [deflection, load, length, secMomArea, modulus]
+
+# Run nondimensionalization process
+pgl = bp.run(paramList, depParam=deflection)
+bp.pprint(pgl)
+
+
+
 print("")
 print('done.')
-
 

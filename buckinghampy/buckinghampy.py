@@ -1,24 +1,37 @@
 from __future__ import print_function
 from operator import itemgetter
 import warnings
+from itertools import combinations
 import numpy as np
 
-__version__ = "0.3"
+__version__ = "0.4"
 
 knownParamDict = {
-'mass': [1],                  # Basic types
+'mass': [1],                   # Basic types
 'length': [0,1],
 'time': [0,0,1],
 'temperature': [0,0,0,1],
-'velocity': [0,1,-1],         # Derived types
+'area': [0,2],                 # Geometry
+'volumne': [0,3],
+'secondMomentOfArea': [0,4],
+'velocity': [0,1,-1],          # Kinematics
 'acceleration': [0,1,-2],
-'force': [1,1,-2],
+'angle': [0],
+'angularVelocity': [0,0,-1],
+'volumneFlowRate': [0,3,-1],
+'massFlowRate': [1,0,-1],
+'force': [1,1,-2],             # Dynamics
+'torque': [1,2,-2],
+'moment': [1,2,-2],
 'energy': [1,2,-2],
+'power': [1,2,-3],
 'pressure': [1,-1,-2],
-'density': [1,-3],            # Fluid Properties
+'stress': [1,-1,-2],
+'density': [1,-3],             # Fluid Properties
 'viscosity': [1,-1,-1],
+'kinematicViscosity': [0,2,-1],
 'conductivity': [1,1,-3,-1],
-'specificheat': [0,2,-2,-1]
+'specificHeat': [0,2,-2,-1]
 }
 
 
@@ -34,9 +47,8 @@ class param:
     4 Temperature (Kelvin, K)
     5 Quantity (moles, mol)
     6 Current (ampere, A)
-    7 Luminous intensity (candela, cd)
+    7 Luminous intensity (candela, cd)"""
 
-    """
 
     def __init__(self, name, ptype=None, dim=[0,0,0,0,0,0,0]):
         self.name = name
@@ -56,30 +68,68 @@ class param:
 
 def numOfTerms(paramList):
     """Takes list of dimensional vectors, returns number of Pi Terms and
-    Repeating Terms.
+    Repeating Terms."""
 
-    """
-    sum = np.array([0,0,0,0,0,0,0])
-    for param in paramList:
-        sum += param.dim**2
+    A = np.vstack([i.dim for i in paramList]).T
+    u, s, vh = np.linalg.svd(A)
+    rank = np.sum( s > 1e-10 )
 
+    numOfDims = rank
     numOfParams = len(paramList)
-    numOfDims = len(sum.nonzero()[0])
+
     numOfRepeat = numOfDims
     numOfPiTerms = numOfParams - numOfDims
     return numOfPiTerms, numOfRepeat
 
 
-def run(paramList, repeatingList):
-    """Takes list of parameters and returns set of Pi groups.
+def checkRepeatingList(paramList, repeatingList):
+    """Test repeatingList to see if it meets BuckinghamPi requirements."""
 
-    """
-
+    # Test length of list
     numOfPiTerms, numOfRepeat = numOfTerms(paramList)
+
+    if (len(repeatingList) != numOfRepeat):
+        warning = "repeatingList should be of length " + str(numOfRepeat) + "."
+        return (False, warning)
+
+    # Test that params are linearly independent
+    A = np.vstack([i.dim for i in repeatingList]).T
+
+    u, s, vh = np.linalg.svd(A)
+    rank = np.sum( s > 1e-10 )
+
+    if (rank != numOfRepeat):
+        warning = "Params are not dimensionally independent"
+        return (False, warning)
+
+    return (True,None)
+
+
+def run(paramList, repeatingList=[], depParam=None):
+    """Takes list of parameters and returns set of Pi groups."""
+
+    # If no repeatingList is given, create a list of all possible repeatingList's.
+    # Use the first repeatingList that satisifies the BuckinghamPi requirements.
+    if (repeatingList == []):
+        numOfPiTerms, numOfRepeat = numOfTerms(paramList)
+        subParamList = list(set(paramList) - set([depParam]))
+        repeatingListList = [list(i) for i in combinations(subParamList, numOfRepeat)]
+        for rList in repeatingListList:
+            test, message = checkRepeatingList(paramList, rList)
+            if test:
+                repeatingList = rList
+                break
+
+    # If a repeatingList is given check to make sure it is valid.
+    else:
+        warntype = "always"
+        warnings.simplefilter(warntype)
+
+        test, message = checkRepeatingList(paramList, repeatingList)
+        if not test:
+            warnings.warn(message)
+
     nonRepeatList = list(set(paramList) - set(repeatingList))
-    if len(repeatingList) != numOfRepeat:
-        warnings.warn("repeatinglist should be of length " 
-                      + str(numOfRepeat) + ".")
 
     PiGroupList = []        
     for obj in nonRepeatList:
@@ -89,16 +139,16 @@ def run(paramList, repeatingList):
     return PiGroupList
     
         
-def calcPiGroup(nonRepeatVar, repeatingList, eps=1e-16):
+def calcPiGroup(nonRepeatVar, repeatingList, eps=1e-15):
     """Given a non--repeating variable and a list of repeating variables,
-    calculate the exponents to create a non--dimensional term.
+    calculate the exponents to create a non--dimensional term."""
 
-    """
     A = nonRepeatVar.dim
     for obj in repeatingList:
         A = np.vstack([A,obj.dim])
 
     A = A.T
+
     u, s, vh = np.linalg.svd(A)
     null_mask = (s <= eps)
     null_space = np.compress(null_mask, vh, axis=0)
@@ -112,13 +162,9 @@ def calcPiGroup(nonRepeatVar, repeatingList, eps=1e-16):
     return (zip(params,powers))
 
 
-def isWholeNum(arr, crit=6):
-    """Requires numpy array input
-    """
-    return (np.round(arr, crit) % 1 == 0)
-
-
 def tryInt(num, crit=6):
+    """Take float, and cast it as an int if it is very close to a whole
+    number value."""
     if (np.round(num, crit) % 1 == 0):
         return int(np.round(num,crit))
     else:
@@ -155,6 +201,11 @@ def scoreFactor(factor,powers):
     return score
 
 
+def isWholeNum(arr, crit=6):
+    """Requires numpy array input."""
+    return (np.round(arr, crit) % 1 == 0)
+
+
 def pprint(PiGroupList):
     i = 1
     for PiGroup in PiGroupList:
@@ -174,3 +225,5 @@ def pprintPiGroup(PiGroup):
             print("(" + param.name + ')', end=" ")
         elif ( tryInt(power) != 0):
             print("(" + param.name + ')^' + str(tryInt(power)), end=" ")
+
+

@@ -13,8 +13,8 @@ If repeatingList is not the right length, it sends a warning.
 ** DONE Sort print from highest positive exponent to least
 ** DONE Print with integer exponents where possible
 * Version 0.3
-** TODO Check to make sure repeatingList meets Buckingham Pi other criteria
-** TODO Simply choose valid repeating variable list if none given
+** DONE Check to make sure repeatingList meets Buckingham Pi other criteria
+** DONE Simply choose valid repeating variable list if none given
 * Version 0.4
 ** TODO Identity PiGroups as special non-dimensional numbers like Re, We, Fr.
 ** TODO Use resulting PiGroups as criteria to determine best repeating variable list.
