@@ -64,4 +64,4 @@ The output of _bp.pprint_ is
      Pi-Group 2:  (D) (eps)^-1 
      Pi-Group 3:  (D) (V) (rho) (mu)^-1 
      
-For some more examples, see demo.py
+For some more examples, see demo.py.
