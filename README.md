@@ -52,7 +52,7 @@ A common early example for dimensional analysis: find the important non-dimensio
      paramList = [DeltaP, diameter, relruf, density, viscosity, velocity]
      repeatingList = [diameter, density, velocity]
 
-Here I am specifying the repeating variables to use, but I could not specify and let the module figure it out. Additionally, I could tell pass the option argument _depParam=DeltaP_ to the module that _DeltaP_ is the dependent parameter and should not be included in the repeating variable list.
+Here I am specifying the repeating variables to use, but I could not specify and let the module figure it out. Additionally, I could pass the option argument _depParam=DeltaP_ to _bp.run_ to tell the module that _DeltaP_ is the dependent parameter and should not be included in the repeating variable list.
 
      # Run nondimensionalization process
      pgl = bp.run(paramList, repeatingList)
@@ -63,3 +63,5 @@ The output of _bp.pprint_ is
      Pi-Group 1:  (D) (DeltaP) (rho)^-1 (V)^-2 
      Pi-Group 2:  (D) (eps)^-1 
      Pi-Group 3:  (D) (V) (rho) (mu)^-1 
+     
+For some more examples, see demo.py.
