@@ -6,6 +6,7 @@ import numpy as np
 
 __version__ = "0.4"
 
+# List of dimensions and associated names.
 knownParamDict = {
 'mass': [1],                   # Basic types
 'length': [0,1],
@@ -36,10 +37,11 @@ knownParamDict = {
 
 
 class param:
-    """Define dimensions vector of a parameter.
+    """
+    Defines a name and dimensional vector for a paramter.
 
-    dimensional vector: 
-    [ M L t T N I J ]
+    The name is a string that will be used as the parameter's symbol,
+    and the dimensional vector is defined as [ M L t T N I J ]. Where
 
     1 Mass (kilogram, k)
     2 Length (metre, m)
@@ -47,7 +49,9 @@ class param:
     4 Temperature (Kelvin, K)
     5 Quantity (moles, mol)
     6 Current (ampere, A)
-    7 Luminous intensity (candela, cd)"""
+    7 Luminous intensity (candela, cd)
+
+    """
 
 
     def __init__(self, name, ptype=None, dim=[0,0,0,0,0,0,0]):
@@ -67,8 +71,17 @@ class param:
 
 
 def numOfTerms(paramList):
-    """Takes list of dimensional vectors, returns number of Pi Terms and
-    Repeating Terms."""
+    """
+    Calculate the number of Pi Groups to be determine and the number
+    of Repeating Terms.
+
+    Args: 
+      paramList: list of params types
+    Returns:
+      numOfPiTerms (int): number of Pi Groups
+      numOfRepeat (int): number of repeating terms
+
+    """
 
     A = np.vstack([i.dim for i in paramList]).T
     u, s, vh = np.linalg.svd(A)
@@ -83,7 +96,17 @@ def numOfTerms(paramList):
 
 
 def checkRepeatingList(paramList, repeatingList):
-    """Test repeatingList to see if it meets BuckinghamPi requirements."""
+    """Test repeatingList to see if it meets BuckinghamPi requirements.
+    
+    If repeatingList is found to NOT be valid return tuple
+    (False,warning). Where False indicates the validity of
+    repeatingList and warning is a text string stating why
+    repeatingList failed.
+
+    If repeatingList is found to be valid return tuple with
+    (True,None).
+
+    """
 
     # Test length of list
     numOfPiTerms, numOfRepeat = numOfTerms(paramList)
@@ -106,7 +129,21 @@ def checkRepeatingList(paramList, repeatingList):
 
 
 def run(paramList, repeatingList=[], depParam=None):
-    """Takes list of parameters and returns set of Pi groups."""
+    """Take list of parameters and returns set of Pi groups.
+
+    Args:
+      paramList (list of param): List of parameters important to the
+                                 dimensional analysis problem.
+      repeatingList (list of param): List of parameters to use as the
+                                     repeating variables. If default 
+                                     empty list, calculate a reasonable list.
+      depParam (param): If present, depParam is the dependent parameter. 
+                        Do not include depParam as a possible selection for
+                        repeatingList.
+    Returns:
+      List of Pi Groups. Where Pi Groups are represents by a list of params.
+
+    """
 
     # If no repeatingList is given, create a list of all possible repeatingList's.
     # Use the first repeatingList that satisifies the BuckinghamPi requirements.
@@ -163,8 +200,17 @@ def calcPiGroup(nonRepeatVar, repeatingList, eps=1e-15):
 
 
 def tryInt(num, crit=6):
-    """Take float, and cast it as an int if it is very close to a whole
-    number value."""
+    """Cast a float as an int, but only if it makes sense.
+
+    If the number is equal to a whole number to X decimal places, cast it as an int.
+
+    Args:
+      num (float): Number to be tested.
+      crit (int): Number of decimal places to check.
+    Returns:
+      num as float or int 
+
+    """
     if (np.round(num, crit) % 1 == 0):
         return int(np.round(num,crit))
     else:
@@ -172,6 +218,8 @@ def tryInt(num, crit=6):
 
 
 def bestFactor(powers):
+    """Determine best factor to use to scale the Pi Group parameters."""
+
     fslist = []
 
     factor = 1/max(abs(powers))
@@ -194,6 +242,9 @@ def bestFactor(powers):
 
 
 def scoreFactor(factor,powers):
+    """Score the factor based on number of whole number powers and number
+    of positive powers."""
+
     trial = factor*powers
     numWhole = sum(isWholeNum(trial))
     numPos = sum(trial > 0)
@@ -207,6 +258,9 @@ def isWholeNum(arr, crit=6):
 
 
 def pprint(PiGroupList):
+    """Takes a PiGroupList and prints all the Pi Groups nicely to the
+    screen."""
+
     i = 1
     for PiGroup in PiGroupList:
         print("Pi-Group " + str(i) + ":  ", end="")
@@ -216,9 +270,8 @@ def pprint(PiGroupList):
 
 
 def pprintPiGroup(PiGroup):
-    """Takes Pi Group and prints output nicely to screen.
+    """Takes Pi Group and prints output nicely to the screen."""
 
-    """
     PiGroup = sorted(PiGroup, key=itemgetter(1), reverse=True)
     for param, power in PiGroup:
         if ( tryInt(power) == 1 ):

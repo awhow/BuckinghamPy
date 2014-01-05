@@ -23,7 +23,7 @@ Here _D_ is the parameter's symbol and _dim_ is the dimension of the parameter. 
      6 Current (ex. ampere, A)
      7 Luminous intensity (ex. candela, cd)
 
-For convience, common parameter archetypes are available using _ptype_. For example, I could have defined the diameter as
+For convenience, common parameter archetypes are available using _ptype_. For example, I could have defined the diameter as
 
      diameter = bp.param('D', ptype='length')
 
@@ -52,7 +52,7 @@ A common early example for dimensional analysis: find the important non-dimensio
      paramList = [DeltaP, diameter, relruf, density, viscosity, velocity]
      repeatingList = [diameter, density, velocity]
 
-Here I am specifying the repeating variables to use, but I could not specify and let the module figure it out. Additionally, I could pass the option argument _depParam=DeltaP_ to _bp.run_ to tell the module that _DeltaP_ is the dependent parameter and should not be included in the repeating variable list.
+Here I am specifying the repeating variables to use, but I could not specify and let the module figure it out. Additionally, I could pass the optional argument _depParam=DeltaP_ to _bp.run_ to tell the module that _DeltaP_ is the dependent parameter and should not be included in the repeating variable list.
 
      # Run nondimensionalization process
      pgl = bp.run(paramList, repeatingList)
