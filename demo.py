@@ -4,12 +4,12 @@ print("Running...")
 print("Simple pendululm example")
 
 # Create parameters
-theta = bp.param('theta')
-theta0  = bp.param('theta0')
-mass = bp.param('m', ptype='mass')
-length = bp.param('l', ptype='length')
-gravity = bp.param('g', ptype='acceleration')
-time = bp.param('t', ptype='time')
+theta = bp.Param('theta')
+theta0  = bp.Param('theta0')
+mass = bp.Param('m', ptype='mass')
+length = bp.Param('l', ptype='length')
+gravity = bp.Param('g', ptype='acceleration')
+time = bp.Param('t', ptype='time')
 
 # Create list of parameters
 paramList = [theta, theta0, mass, length, gravity, time]
@@ -25,12 +25,12 @@ print("")
 print("Pipe flow pressure drop")
 
 # Create parameters
-DeltaP = bp.param('DeltaP', dim=[1,-2,-2])
-diameter = bp.param('D', ptype='length')
-relruf = bp.param('eps', ptype='length')
-density = bp.param('rho', ptype='density')
-viscosity = bp.param('mu', ptype='viscosity')
-velocity = bp.param('V', ptype='velocity')
+DeltaP = bp.Param('DeltaP', dim=[1,-2,-2])
+diameter = bp.Param('D', ptype='length')
+relruf = bp.Param('eps', ptype='length')
+density = bp.Param('rho', ptype='density')
+viscosity = bp.Param('mu', ptype='viscosity')
+velocity = bp.Param('V', ptype='velocity')
 
 # Create list of parameters
 paramList = [DeltaP, diameter, relruf, density, viscosity, velocity]
@@ -43,16 +43,16 @@ bp.pprint(pgl)
 
 
 print("")
-print("Lift on  a Wing")
+print("Lift on a Wing")
 
 # Create parameters
-lift = bp.param('FL', ptype='force')
-velocity = bp.param('V', ptype='velocity')
-cord = bp.param('Lc', ptype='length')
-density = bp.param('rho', ptype='density')
-viscosity = bp.param('mu', ptype='viscosity')
-soundspeed = bp.param('c', ptype='velocity')
-attack = bp.param('alpha', ptype='angle')
+lift = bp.Param('FL', ptype='force')
+velocity = bp.Param('V', ptype='velocity')
+cord = bp.Param('Lc', ptype='length')
+density = bp.Param('rho', ptype='density')
+viscosity = bp.Param('mu', ptype='viscosity')
+soundspeed = bp.Param('c', ptype='velocity')
+attack = bp.Param('alpha', ptype='angle')
 
 # Create list of parameters
 paramList = [lift, velocity, cord, density, viscosity, soundspeed, attack]
@@ -67,11 +67,11 @@ print("")
 print("Tip Deflection of Cantilever Beam")
 
 # Create parameters
-deflection = bp.param('delta', ptype='length')
-load = bp.param('W', ptype='force')
-length = bp.param('L', ptype='length')
-secMomArea = bp.param('I', ptype='secondMomentOfArea')
-modulus = bp.param('E', dim=[1,-1,-2])
+deflection = bp.Param('delta', ptype='length')
+load = bp.Param('W', ptype='force')
+length = bp.Param('L', ptype='length')
+secMomArea = bp.Param('I', ptype='secondMomentOfArea')
+modulus = bp.Param('E', dim=[1,-1,-2])
 
 # Create list of parameters
 paramList = [deflection, load, length, secMomArea, modulus]

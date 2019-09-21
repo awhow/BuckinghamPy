@@ -1,73 +1,12 @@
-from __future__ import print_function
 from operator import itemgetter
 import warnings
 from itertools import combinations
 import numpy as np
 
+from .helpers import isWholeNum
+
+
 __version__ = "0.4"
-
-# List of dimensions and associated names.
-knownParamDict = {
-'mass': [1],                   # Basic types
-'length': [0,1],
-'time': [0,0,1],
-'temperature': [0,0,0,1],
-'area': [0,2],                 # Geometry
-'volumne': [0,3],
-'secondMomentOfArea': [0,4],
-'velocity': [0,1,-1],          # Kinematics
-'acceleration': [0,1,-2],
-'angle': [0],
-'angularVelocity': [0,0,-1],
-'volumneFlowRate': [0,3,-1],
-'massFlowRate': [1,0,-1],
-'force': [1,1,-2],             # Dynamics
-'torque': [1,2,-2],
-'moment': [1,2,-2],
-'energy': [1,2,-2],
-'power': [1,2,-3],
-'pressure': [1,-1,-2],
-'stress': [1,-1,-2],
-'density': [1,-3],             # Fluid Properties
-'viscosity': [1,-1,-1],
-'kinematicViscosity': [0,2,-1],
-'conductivity': [1,1,-3,-1],
-'specificHeat': [0,2,-2,-1]
-}
-
-
-class param:
-    """
-    Defines a name and dimensional vector for a paramter.
-
-    The name is a string that will be used as the parameter's symbol,
-    and the dimensional vector is defined as [ M L t T N I J ]. Where
-
-    1 Mass (kilogram, k)
-    2 Length (metre, m)
-    3 Time (second, s)
-    4 Temperature (Kelvin, K)
-    5 Quantity (moles, mol)
-    6 Current (ampere, A)
-    7 Luminous intensity (candela, cd)
-
-    """
-
-
-    def __init__(self, name, ptype=None, dim=[0,0,0,0,0,0,0]):
-        self.name = name
-        
-        if ptype is not None:
-            dim = knownParamDict[ptype]
-
-        dim += [0]*(7-len(dim)) # Pad dim with zeros. 
-        self.dim = np.array(dim)
-
-    def __repr__(self):
-        return '(%s)' % self.name
-
-    def __str__(self):
-        return str(self.name) + ': ' + str(self.dim)
 
 
 def numOfTerms(paramList):
@@ -75,7 +14,7 @@ def numOfTerms(paramList):
     Calculate the number of Pi Groups to be determine and the number
     of Repeating Terms.
 
-    Args: 
+    Args:
       paramList: list of params types
     Returns:
       numOfPiTerms (int): number of Pi Groups
@@ -97,7 +36,7 @@ def numOfTerms(paramList):
 
 def checkRepeatingList(paramList, repeatingList):
     """Test repeatingList to see if it meets BuckinghamPi requirements.
-    
+
     If repeatingList is found to NOT be valid return tuple
     (False,warning). Where False indicates the validity of
     repeatingList and warning is a text string stating why
@@ -135,9 +74,9 @@ def run(paramList, repeatingList=[], depParam=None):
       paramList (list of param): List of parameters important to the
                                  dimensional analysis problem.
       repeatingList (list of param): List of parameters to use as the
-                                     repeating variables. If default 
+                                     repeating variables. If default
                                      empty list, calculate a reasonable list.
-      depParam (param): If present, depParam is the dependent parameter. 
+      depParam (param): If present, depParam is the dependent parameter.
                         Do not include depParam as a possible selection for
                         repeatingList.
     Returns:
@@ -168,14 +107,14 @@ def run(paramList, repeatingList=[], depParam=None):
 
     nonRepeatList = list(set(paramList) - set(repeatingList))
 
-    PiGroupList = []        
+    PiGroupList = []
     for obj in nonRepeatList:
         PiGroup = calcPiGroup(obj, repeatingList)
         PiGroupList.append(PiGroup)
-        
+
     return PiGroupList
-    
-        
+
+
 def calcPiGroup(nonRepeatVar, repeatingList, eps=1e-15):
     """Given a non--repeating variable and a list of repeating variables,
     calculate the exponents to create a non--dimensional term."""
@@ -197,24 +136,6 @@ def calcPiGroup(nonRepeatVar, repeatingList, eps=1e-15):
     powers = factor*null_space
     params = [nonRepeatVar] + repeatingList
     return (zip(params,powers))
-
-
-def tryInt(num, crit=6):
-    """Cast a float as an int, but only if it makes sense.
-
-    If the number is equal to a whole number to X decimal places, cast it as an int.
-
-    Args:
-      num (float): Number to be tested.
-      crit (int): Number of decimal places to check.
-    Returns:
-      num as float or int 
-
-    """
-    if (np.round(num, crit) % 1 == 0):
-        return int(np.round(num,crit))
-    else:
-        return num
 
 
 def bestFactor(powers):
@@ -250,33 +171,5 @@ def scoreFactor(factor,powers):
     numPos = sum(trial > 0)
     score = numWhole + numPos
     return score
-
-
-def isWholeNum(arr, crit=6):
-    """Requires numpy array input."""
-    return (np.round(arr, crit) % 1 == 0)
-
-
-def pprint(PiGroupList):
-    """Takes a PiGroupList and prints all the Pi Groups nicely to the
-    screen."""
-
-    i = 1
-    for PiGroup in PiGroupList:
-        print("Pi-Group " + str(i) + ":  ", end="")
-        i+=1
-        pprintPiGroup(PiGroup)
-        print("")
-
-
-def pprintPiGroup(PiGroup):
-    """Takes Pi Group and prints output nicely to the screen."""
-
-    PiGroup = sorted(PiGroup, key=itemgetter(1), reverse=True)
-    for param, power in PiGroup:
-        if ( tryInt(power) == 1 ):
-            print("(" + param.name + ')', end=" ")
-        elif ( tryInt(power) != 0):
-            print("(" + param.name + ')^' + str(tryInt(power)), end=" ")
 
 

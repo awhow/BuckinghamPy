@@ -13,7 +13,7 @@ import buckinghampy as bp
 Create some parameters. For instance, I can create a parameter with
 
 ```python
-diameter = bp.param('D', dim=[0,1])
+diameter = bp.Param('D', dim=[0,1])
 ```
 
 Here _D_ is the parameter's symbol and _dim_ is the dimension of the parameter. The dimension array is represented by a vector where each index location corresponds to a base dimension. 
@@ -30,7 +30,7 @@ Here _D_ is the parameter's symbol and _dim_ is the dimension of the parameter. 
 For convenience, common parameter archetypes are available using _ptype_. For example, I could have defined the diameter as
 
 ```python
-diameter = bp.param('D', ptype='length')
+diameter = bp.Param('D', ptype='length')
 ```
 
 After a number of parameters have been created, join them in a list.
@@ -52,12 +52,12 @@ A common early example for dimensional analysis: find the important non-dimensio
 
 ```python
 # Important parameters
-DeltaP = bp.param('DeltaP', dim=[1,-2,-2])
-diameter = bp.param('D', ptype='length')
-relruf = bp.param('eps', ptype='length')
-density = bp.param('rho', ptype='density')
-viscosity = bp.param('mu', ptype='viscosity')
-velocity = bp.param('V', ptype='velocity')
+DeltaP = bp.Param('DeltaP', dim=[1,-2,-2])
+diameter = bp.Param('D', ptype='length')
+relruf = bp.Param('eps', ptype='length')
+density = bp.Param('rho', ptype='density')
+viscosity = bp.Param('mu', ptype='viscosity')
+velocity = bp.Param('V', ptype='velocity')
 
 # Create list of parameters
 paramList = [DeltaP, diameter, relruf, density, viscosity, velocity]
