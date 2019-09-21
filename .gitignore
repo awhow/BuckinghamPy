@@ -1,3 +1,6 @@
-*/.emacs.bak
-old/
 *.pyc
+__pycache__/
+dist/
+build/
+*.egg
+*.egg-info/

@@ -6,9 +6,6 @@ import numpy as np
 from .helpers import isWholeNum
 
 
-__version__ = "0.4"
-
-
 def numOfTerms(paramList):
     """
     Calculate the number of Pi Groups to be determine and the number
